@@ -1,4 +1,4 @@
-# Edge-assisted Task-oriented Communication for Collaborative Embodied UAV Inference
+# Edge-assisted Task-oriented Communication for Collaborative Embodied Multi-UAV Inference
 
 **Exaud Tarimo, Huanlai Xing\*, Lexi Xu, Zonghai Zhu, Li Feng, Farhan Hussein, and Ali Kamran**
 
