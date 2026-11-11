@@ -5,26 +5,7 @@
 School of Computing and Artificial Intelligence, Southwest Jiaotong University, Chengdu, China ·
 Research Institute, China United Network Communications Corporation, Beijing, China
 (\* corresponding author: hxx@home.swjtu.edu.cn)
-
-This repository contains the code for our manuscript (under review).
-## Abstract
-
-Embodied UAVs with on-board inference capabilities are enabling real-time task decisions at the edge, without
-relying on continuous transmission of compressed visual data over bandwidth-limited, unreliable UAV links.
-However, how to unleash the full potential of a multi-UAV network requires careful coordination among
-distributed agents, catering to uneven inference accuracy and heterogeneous communication costs across UAVs and
-the edge server. This paper presents a framework for collaborative embodied UAV inference that keeps semantic
-latent compact and communication decisions adaptive, while achieving low inference latency and high task
-accuracy. The key idea behind the framework is that local inference reliability should govern when and with whom
-a UAV communicates, avoiding redundant transmission while uncertain observations are selectively resolved
-through collaboration. The framework consists of three main components (i) a lightweight semantic perception
-and collaborative reasoning network (SPCRNet) module to extract and compresses visual observations into
-task-relevant tokens and inference confidence score, (ii) an adaptive collaboration selector that activates
-agent-to-agent semantic exchange or agent-to-ground semantic offloading only when local confidence falls below a
-learned threshold and (iii) a WGAE-PPO resource scheduler that jointly learns communication-mode and bandwidth
-allocation decisions under a long-term communication-cost constraint. Our code is publicly available at
-[github.com/exaud40/SPCRNet](https://github.com/exaud40/SPCRNet).
-
+This repository contains the code for our manuscript under review.
 
 ## Getting Started
 
