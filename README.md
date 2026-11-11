@@ -1,15 +1,17 @@
 # Edge-assisted Task-oriented Communication for Collaborative Embodied Multi-UAV Inference
 
-**Exaud Tarimo, Huanlai Xing\*, Lexi Xu, Zonghai Zhu, Li Feng, Farhan Hussein, and Ali Kamran**
+**Exaud Tarimo, Huanlai Xing\*, Rong Qu, Zhiwen Xiao, Ali Kamran, and Weihua Ma**
 
 School of Computing and Artificial Intelligence, Southwest Jiaotong University, Chengdu, China ·
 Research Institute, China United Network Communications Corporation, Beijing, China
 (\* corresponding author: hxx@home.swjtu.edu.cn)
+
+
 This repository contains the code for our manuscript under review.
 
 ## Getting Started
 
-Tested with Python 3.10–3.13, PyTorch 2.x with CUDA, on Windows 11 and Linux with one NVIDIA RTX 3080 (10 GB).
+Tested with Python 3.10–3.13, PyTorch 2.x with CUDA, on Windows 11 and Linux with NVIDIA RTX 3080.
 
 ```bash
 git clone https://github.com/exaud40/SPCRNet.git
@@ -22,25 +24,13 @@ pip install -e .
 python -m pytest              # all tests should pass and GPU tests run if PyTorch sees a GPU
 ```
 
-All commands below are run from the repository root. Outputs go to `caches/`, `runs/`, `runs_perception/`,
-`results/`, and `figures/`.
-
 ## Inference and Evaluation
 
-There are two independent tracks. **Track A** (controlled benchmark) needs no dataset and **Track B** (MDMT) needs the MDMT dataset.
-
-Runtimes are those measured on our GPU.
-
-### Track A — controlled benchmark
+### Track A — Multi-UAV benchmark
 
 ```bash
-# 1. benchmark caches (seconds)
 python -m uavsc.data.synthetic --out caches/synth
-
-# 2. Runs 4-7: convergence, policy behavior, comparison + sweeps, ablation
 python -m uavsc.eval.experiments.run_all --cache caches/synth --seeds 0,1,2,3,4 --parallel 6
-
-# 3. policy-gradient statistics on frozen checkpoints (trains three short runs)
 python -m uavsc.eval.experiments.run4b_variance --cache caches/synth
 ```
 
@@ -48,41 +38,28 @@ python -m uavsc.eval.experiments.run4b_variance --cache caches/synth
 processes and reduce it if memory is short.
 
 
-
-Key numbers to check against our manuscript. WGAE-PPO (κ = 2) reaches 95% of its final QoE in about 117 iterations
-versus about 196 for GAE-PPO.At equal QoE, Greedy-Gate needs 21%–38% more energy than the learned policy
-(`energy_saving_vs_greedy` in `results/run6.json`).
-
 ### Track B — MDMT 
 
 **Step 0 — dataset.** Download MDMT from the
 [official repository](https://github.com/VisDrone/Multi-Drone-Multi-Object-Detection-and-Tracking) and keep its
 folder structure, e.g. `D:\Datasets\MDMT-VisDrone\{train,val,test}\{1,2}\...` with the CVAT XML annotations.
 
-**Step 1 — prepare frames, labels, splits, boxes (minutes).**
+**Step 1 — prepare frames, labels, splits, boxes.**
 
 ```bash
 python -m uavsc.data.mdmt stats   --root /path/to/MDMT-VisDrone
 python -m uavsc.data.mdmt prepare --root /path/to/MDMT-VisDrone --width 1024 --height 576 --img_dir img1024
 python -m uavsc.data.mdmt boxes   --root /path/to/MDMT-VisDrone
-python -m uavsc.data.mdmt ceiling          # accuracy reachable from perfect counts 
+python -m uavsc.data.mdmt ceiling           
 ```
 
-The scene label is the number of distinct targets in the union of both views, quantized into four levels
-(boundaries 45, 76, 108). Splits: MDMT train → train + held-out, MDMT val → calibration, MDMT test → test.
-
-**Step 2 — split SPCRNet with scene cross-fitting (about 3.5 h).** Four folds over the 44 sequence pairs; every
-scene is predicted by a model that never saw it; calibration of a fold uses only the other folds.
+**Step 2 — split SPCRNet with scene cross-fitting.**
 
 ```bash
 python -m pytest -m m6                                            # smoke tests of the perception code
 python -m uavsc.perception.crossfit_split --smoke                 # end-to-end check
 python -m uavsc.perception.crossfit_split --snr_grid=-15,-10,-7.5,-5,-2.5,0,5,10,20
 ```
-
-Keep the `=` in `--snr_grid=-15,...`. Folds can be run separately (`--fold 0` … `--fold 3`) and pooled with
-`--report_only`. Outputs: `runs_perception/crossfit/metrics.json` and the cross-fitted caches in
-`caches/mdmt_cf/`.
 
 **Step 3 — what each mode delivers, fidelity functions.**
 
@@ -95,12 +72,9 @@ python -m uavsc.eval.plot_fidelity --report caches/mdmt_cf/fidelity_report.json 
 **Step 4 — measured computation and payload → `configs/mdmt.yaml`.**
 
 ```bash
-python -m uavsc.perception.cost                                  # chi_L, chi_G, k_s; E_bar = 6.2% of Always-A2G
+python -m uavsc.perception.cost                                  
 python -m uavsc.eval.operating_point --config configs/mdmt.yaml  # latency / energy / SNR check
 ```
-
-The onboard and edge throughputs (`--f_U 5e12`, `--f_G 3e13` FLOPS) are stated assumptions. The computation loads
-and the payload size are measured on the trained model.
 
 **Step 5 — end-to-end policies on MDMT.**
 
@@ -112,17 +86,13 @@ python -m uavsc.eval.experiments.run6_comparison --config configs/mdmt.yaml --ca
 python -m uavsc.eval.diag_shift --config configs/mdmt.yaml --cache caches/mdmt_cf --out_dir results_mdmt
 ```
 
-The second command tunes the threshold baselines on the training sequences, i.e. on the data the policy learns
-from. The third evaluates every rule on each split and produces the per-split analysis.
-
-
 ## Citation
 
 ```bibtex
 @article{tarimo2026edge,
   title   = {Edge-assisted Task-oriented Communication for Collaborative Embodied UAV Inference},
-  author  = {Tarimo, Exaud and Xing, Huanlai and Xu, Lexi and Zhu, Zonghai and Feng, Li and
-             Hussein, Farhan and Kamran, Ali},
+  author  = {Tarimo, Exaud and Xing, Huanlai and Qu, Rong and Xiao, Zhiwen and Kamran, Ali and
+             and Ma, Weihua},
   journal = {under review},
   year    = {2026}
 }
@@ -130,6 +100,5 @@ from. The third evaluates every rule on each split and produces the per-split an
 
 ## Acknowledgments
 
-This work is supported by the Sichuan Science and Technology Program (2024NSFSC1472). The MDMT dataset is
-provided by its authors through the VisDrone project; please cite their work when using it.
+This work was partially supported by the Natural Science Foundation of Sichuan Province (No. 2026NSFSC0433), the Doctoral Innovation Fund Program of Southwest Jiaotong University (No. CX-2025ZD09), and the Fundamental Research Funds for the Central Universities, P. R. China, and the University of Nottingham, UK
 
