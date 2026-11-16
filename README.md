@@ -11,7 +11,7 @@ This repository contains the code for our manuscript under review.
 
 ## Getting Started
 
-Tested with Python 3.10–3.13, PyTorch 2.x with CUDA, on Windows 11 and Linux with NVIDIA RTX 3080.
+Tested with Python 3.10–3.13, PyTorch 2.x with CUDA, on Windows 11 and Linux.
 
 ```bash
 git clone https://github.com/exaud40/SPCRNet.git
