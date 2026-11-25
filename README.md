@@ -55,8 +55,6 @@ python -m uavsc.data.mdmt ceiling
 **Step 2 — split SPCRNet with scene cross-fitting.**
 
 ```bash
-python -m pytest -m m6                                            # smoke tests of the perception code
-python -m uavsc.perception.crossfit_split --smoke                 # end-to-end check
 python -m uavsc.perception.crossfit_split --snr_grid=-15,-10,-7.5,-5,-2.5,0,5,10,20
 ```
 
