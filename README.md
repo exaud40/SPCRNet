@@ -18,10 +18,9 @@ git clone https://github.com/exaud40/SPCRNet.git
 cd SPCRNet
 conda create -n uavsc python=3.11 -y
 conda activate uavsc
-# install PyTorch + torchvision for your CUDA version first: https://pytorch.org/get-started/locally/
 pip install -r requirements.txt
 pip install -e .
-python -m pytest              # all tests should pass and GPU tests run if PyTorch sees a GPU
+python -m pytest         
 ```
 
 ## Inference and Evaluation
