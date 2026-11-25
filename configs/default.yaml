@@ -1,0 +1,90 @@
+# All parameters of Table II. Keys use the paper's symbols.
+# Values marked "# TBD" are suggestions to confirm.
+
+seed: 0
+
+network:
+  N: 1                 # clusters
+  M: 6                 # followers per cluster
+  J: 3                 # edge servers per cluster
+  area_radius: 200.0   # m
+  H: 100.0             # UAV altitude [m]
+  l_max: 30.0          # max displacement per slot [m]
+  d_min: 10.0          # TBD [m]
+  d_max: 150.0         # TBD, also A2A range [m]
+  edge_radius: 1000.0  # edge servers uniform within this radius of the cluster center [m]
+  views_per_scene: 2   # co-observing followers per scene (MDMT: 2)
+
+channel:
+  f_c: 2.6e+9           # Hz
+  B_tot: 2.0e+6         # TBD cluster band [Hz]
+  P_max_dbm: 20.0      # TBD follower max power
+  P_l_dbm: 23.0        # TBD leader relay power (200 mW)
+  N0_dbm_hz: -174.0    # thermal noise PSD
+  NF_db: 10.0          # receiver noise figure (effective N0 = N0 + NF)
+  E0: 1.0e-4           # per-link overhead energy [J] = P_c * T_oh = 100 mW * 1 ms
+  a: 12.08             # Al-Hourani dense urban
+  b: 0.11
+  eta_los_db: 1.6
+  eta_nlos_db: 23.0
+  nakagami_m: 3.0      # TBD
+
+semantic:
+  k_b: 8               # TBD belief payload [complex symbols] (|Y|+1 reals -> ~(C+1)/2 symbols)
+  k_s: 1568            # TBD token payload: L_s*d/2 = 49*64/2 complex symbols
+  snr_grid_db: [-10, -7.5, -5, -2.5, 0, 2.5, 5, 7.5, 10, 12.5, 15, 17.5, 20, 22.5, 25]
+
+compute:
+  chi_L: 1.0e+9         # TBD SPCRNet FLOPs (from Run 8)
+  chi_F: 1.0e+4         # fusion FLOPs (negligible)
+  chi_G: 2.0e+12        # TBD edge reasoning model FLOPs (from Run 8)
+  f_U: 1.0e+11          # TBD effective onboard FLOPS (embedded; from Run 8)
+  f_G: 3.0e+13          # TBD edge FLOPS
+
+qoe:
+  tau: 1.0             # TBD slot duration [s]
+  D_th: 0.1            # TBD deadline [s] (10 Hz control)
+  zeta_D: 100.0        # TBD steepness [1/s]
+
+constraint:
+  E_bar: 1.0e-4        # energy budget [J/follower/slot]; binds (mu > 0): the learned policy uses ~1.6-1.9e-4 J when the budget is loose
+  delta_min: 0.5
+  delta_max: 0.95
+  delta_margin: 0.05   # Delta_th
+
+env:
+  episode_len: 200
+  progress_on_correct: true
+  confidence_source: calibrated   # ablation: raw | msp
+  allowed_modes: [0, 1, 2]        # ablation: [0, 1] (A2A only) or [0, 2] (A2G only)
+
+rl:
+  gamma_disc: 0.99     # varrho
+  gae_lambda: 0.95
+  kappa: 2.0           # WGAE sensitivity (0 -> GAE); 2 chosen by Run 4 / Run 4b (fastest, least direction bias)
+  kappa_anneal_iters: 200 # kappa -> 0 linearly over 200 of 400 iterations: WGAE early, GAE late (Run 4c); 0 = constant
+  clip_eps: 0.2
+  entropy_coef: 0.01   # bonus on the MODE entropy only (see rl/networks.py)
+  lr_actor: 3.0e-4
+  lr_critic: 1.0e-3
+  lr_dual: 0.05        # dual step on normalized energy E/E_bar (see rl/constraints.py)
+  ppo_epochs: 4
+  minibatch: 1024       # samples = (slot, env, follower) triples
+  rollout_len: 2048    # T_r: slots per iteration, summed over the parallel environments
+  n_envs: 8            # parallel cluster environments (one batched actor call per slot)
+  iterations: 400
+  hidden: [400, 300]
+  seeds: [0, 1, 2, 3, 4]
+
+perception:
+  backbone: fastvit_t8   # TBD variant (timm name)
+  img_size: 224
+  d: 64                  # TBD token dim after bottleneck
+  d_hidden: 256          # TBD d'
+  num_classes: 4         # |Y|: MDMT scene density levels, edges 45/76/108 targets (data/mdmt.py)
+  attn_heads: 4
+  ssm_state: 16          # N_x
+  token_grid: 7          # L_s = 49 tokens
+  img_w: 512             # MDMT frames resized to 512 x 288
+  img_h: 288
+  split: {train: 0.60, heldout: 0.15, cal: 0.10, test: 0.15}

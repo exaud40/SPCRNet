@@ -1,0 +1,104 @@
+# MDMT configuration written by uavsc.perception.cost from configs/default.yaml.
+# Measured: chi_L, chi_G (22.7 / 56.8 GMACs at 1024x576), k_s (c_b = 8). Assumed: f_U = 5.0e+12, f_G = 3.0e+13 FLOPS.
+# E_bar = 0.062 x Always-A2G energy.
+seed: 0
+network:
+  N: 1
+  M: 6
+  J: 3
+  area_radius: 200.0
+  H: 100.0
+  l_max: 30.0
+  d_min: 10.0
+  d_max: 150.0
+  edge_radius: 1000.0
+  views_per_scene: 2
+channel:
+  f_c: 2600000000.0
+  B_tot: 2000000.0
+  P_max_dbm: 20.0
+  P_l_dbm: 23.0
+  N0_dbm_hz: -174.0
+  NF_db: 10.0
+  E0: 0.0001
+  a: 12.08
+  b: 0.11
+  eta_los_db: 1.6
+  eta_nlos_db: 23.0
+  nakagami_m: 3.0
+semantic:
+  k_b: 8
+  k_s: 9216
+  snr_grid_db:
+  - -15.0
+  - -10.0
+  - -7.5
+  - -5.0
+  - -2.5
+  - 0.0
+  - 5.0
+  - 10.0
+  - 20.0
+compute:
+  chi_L: 45386662144.0
+  chi_F: 10000.0
+  chi_G: 113691329024.0
+  f_U: 5000000000000.0
+  f_G: 30000000000000.0
+qoe:
+  tau: 1.0
+  D_th: 0.1
+  zeta_D: 100.0
+constraint:
+  E_bar: 0.000526
+  delta_min: 0.5
+  delta_max: 0.95
+  delta_margin: 0.05
+env:
+  episode_len: 200
+  progress_on_correct: true
+  confidence_source: calibrated
+  allowed_modes:
+  - 0
+  - 1
+  - 2
+rl:
+  gamma_disc: 0.99
+  gae_lambda: 0.95
+  kappa: 2.0
+  kappa_anneal_iters: 200
+  clip_eps: 0.2
+  entropy_coef: 0.01
+  lr_actor: 0.0003
+  lr_critic: 0.001
+  lr_dual: 0.05
+  ppo_epochs: 4
+  minibatch: 1024
+  rollout_len: 2048
+  n_envs: 8
+  iterations: 400
+  hidden:
+  - 400
+  - 300
+  seeds:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+perception:
+  backbone: fastvit_t8
+  img_size: 224
+  d: 64
+  d_hidden: 256
+  num_classes: 4
+  attn_heads: 4
+  ssm_state: 16
+  token_grid: 7
+  img_w: 512
+  img_h: 288
+  split:
+    train: 0.6
+    heldout: 0.15
+    cal: 0.1
+    test: 0.15
