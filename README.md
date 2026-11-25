@@ -61,12 +61,11 @@ python -m uavsc.perception.crossfit_split --smoke                 # end-to-end c
 python -m uavsc.perception.crossfit_split --snr_grid=-15,-10,-7.5,-5,-2.5,0,5,10,20
 ```
 
-**Step 3 — what each mode delivers, fidelity functions.**
+**Step 3 — Mode evaluation.**
 
 ```bash
 python -m uavsc.eval.mode_value --cache caches/mdmt_cf --run runs_perception/crossfit
 python -m uavsc.data.mdmt_fidelity --run runs_perception/crossfit --cache caches/mdmt_cf
-python -m uavsc.eval.plot_fidelity --report caches/mdmt_cf/fidelity_report.json --out figures/mdmt_fidelity
 ```
 
 **Step 4 — measured computation and payload → `configs/mdmt.yaml`.**
